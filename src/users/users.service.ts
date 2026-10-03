@@ -94,15 +94,15 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    // Implement soft-delete (deactivation) as per instructions
-    try {
-      const user = await this.prisma.user.update({
-        where: { id },
-        data: { status: 'INACTIVE' },
-      });
-      return { data: user };
-    } catch (e) {
-      throw new NotFoundException('User not found');
-    }
+    return this.prisma.$transaction(async (transaction) => {
+      const user = await transaction.user.findUnique({ where: { id } });
+      if (!user) throw new NotFoundException('User not found');
+
+      await transaction.transaction.deleteMany({ where: { userId: id } });
+      await transaction.booking.deleteMany({ where: { userId: id } });
+      const deletedUser = await transaction.user.delete({ where: { id } });
+
+      return { data: deletedUser };
+    });
   }
 }

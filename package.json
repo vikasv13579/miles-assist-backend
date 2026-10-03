@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "nest build",
+    "vercel-build": "prisma migrate deploy && nest build",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -18,6 +19,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "oxlint --type-aware src/ test/",
+    "migrate:deploy": "prisma migrate deploy",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",

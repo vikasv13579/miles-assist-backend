@@ -29,6 +29,7 @@ The project follows a standard NestJS module-based architecture:
 - **User**: Dashboard users.
 - **Transaction**: Financial records linked to a User.
 - **Booking**: Appointments linked to a User.
+- **DashboardSettings**: Persisted dashboard maintenance and runtime-memory alert settings.
 
 \`\`\`mermaid
 erDiagram
@@ -106,6 +107,15 @@ npm run prisma:seed
 # Development mode
 npm run start:dev
 \`\`\`
+
+## Dashboard tabs
+
+- **Overview** uses \`GET /dashboard/stats\`, \`/dashboard/charts\`, \`/dashboard/alerts\`, and \`/dashboard/health\`.
+- **Analytics** uses \`GET /dashboard/analytics\` for the previous 30 days.
+- **Reports** uses \`GET /dashboard/reports?fromDate=YYYY-MM-DD&toDate=YYYY-MM-DD\`.
+- **Settings** reads and updates \`GET /dashboard/settings\` and \`PATCH /dashboard/settings\`. Settings are stored in PostgreSQL; maintenance time can be cleared with \`maintenanceScheduledAt: null\`, and the runtime memory threshold accepts values from 50 to 99.
+
+The Vercel build runs \`prisma migrate deploy\` before compiling so new database migrations are applied during deployment. Keep \`DATABASE_URL\` configured for the backend Vercel project.
 
 ## Swagger & API Documentation
 Once running, Swagger UI is available at:

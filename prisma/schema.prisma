@@ -15,6 +15,13 @@ model Admin {
   updatedAt    DateTime @updatedAt
 }
 
+model DashboardSettings {
+  id                           String    @id @default("default")
+  maintenanceScheduledAt       DateTime?
+  runtimeMemoryAlertThreshold  Int       @default(90)
+  updatedAt                    DateTime  @updatedAt
+}
+
 model User {
   id           String        @id @default(uuid())
   email        String        @unique

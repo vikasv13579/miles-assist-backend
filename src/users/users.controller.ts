@@ -38,7 +38,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete (deactivate) a user' })
+  @ApiOperation({ summary: 'Permanently delete a user and their bookings and transactions' })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }

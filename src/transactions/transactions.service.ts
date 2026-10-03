@@ -21,13 +21,25 @@ export class TransactionsService {
   }
 
   async findAll(query: QueryTransactionDto) {
-    const { page = 1, limit = 10, search, status, sortBy, sortOrder = 'desc', fromDate, toDate } = query;
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      status,
+      sortBy,
+      sortOrder = 'desc',
+      fromDate,
+      toDate,
+      minAmount,
+      maxAmount,
+    } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.TransactionWhereInput = {};
 
     if (search) {
       where.OR = [
+        { id: { contains: search, mode: 'insensitive' } },
         { reference: { contains: search, mode: 'insensitive' } },
         { user: { name: { contains: search, mode: 'insensitive' } } },
         { user: { email: { contains: search, mode: 'insensitive' } } },
@@ -41,6 +53,11 @@ export class TransactionsService {
       if (fromDate) where.createdAt.gte = new Date(fromDate);
       if (toDate) where.createdAt.lte = new Date(toDate);
     }
+    if (minAmount !== undefined || maxAmount !== undefined) {
+      where.amount = {};
+      if (minAmount !== undefined) where.amount.gt = minAmount;
+      if (maxAmount !== undefined) where.amount.lt = maxAmount;
+    }
 
     const orderBy: any = {};
     const allowedSortFields = ['createdAt', 'updatedAt', 'amount', 'status', 'reference'];
@@ -50,7 +67,7 @@ export class TransactionsService {
       orderBy.createdAt = 'desc';
     }
 
-    const [items, total] = await Promise.all([
+    const [items, total, aggregate, successfulTransactions] = await Promise.all([
       this.prisma.transaction.findMany({
         where,
         skip,
@@ -59,6 +76,12 @@ export class TransactionsService {
         include: { user: { select: { name: true, email: true } } }
       }),
       this.prisma.transaction.count({ where }),
+      this.prisma.transaction.aggregate({
+        where,
+        _sum: { amount: true },
+        _avg: { amount: true },
+      }),
+      this.prisma.transaction.count({ where: { ...where, status: 'SUCCESS' } }),
     ]);
 
     return {
@@ -68,6 +91,11 @@ export class TransactionsService {
         limit,
         total,
         totalPages: Math.ceil(total / limit),
+        summary: {
+          totalVolume: Number(aggregate._sum.amount ?? 0),
+          averageTransaction: Number(aggregate._avg.amount ?? 0),
+          successRate: total ? (successfulTransactions / total) * 100 : 0,
+        },
       },
     };
   }
