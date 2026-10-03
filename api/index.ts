@@ -1,15 +1,18 @@
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from '../src/app.module.js';
+import { configureApp } from '../src/app.factory.js';
 import type { Request, Response } from 'express';
-import { createApp } from '../src/app.factory.js';
 
-let appPromise: ReturnType<typeof createApp> | undefined;
+let appPromise: ReturnType<typeof NestFactory.create> | undefined;
 
 export default async function handler(request: Request, response: Response) {
-  appPromise ??= createApp().then(async (app) => {
+  appPromise ??= NestFactory.create(AppModule).then(async (app) => {
+    configureApp(app);
     await app.init();
     return app;
   });
 
-  let app: Awaited<ReturnType<typeof createApp>>;
+  let app: Awaited<ReturnType<typeof NestFactory.create>>;
   try {
     app = await appPromise;
   } catch (error) {

@@ -1,13 +1,11 @@
 import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
-import { AppModule } from './app.module.js';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
 
-export async function createApp() {
-  const app = await NestFactory.create(AppModule);
+export function configureApp(app: INestApplication) {
   app.use(helmet());
 
   app.use((req: Request, res: Response, next: NextFunction) => {
