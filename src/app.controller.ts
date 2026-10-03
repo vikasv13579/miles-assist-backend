@@ -20,7 +20,8 @@ export class AppController {
       await this.prisma.$queryRaw`SELECT 1`;
       return { status: 'ok', database: 'connected' };
     } catch (error) {
-      throw new ServiceUnavailableException({ status: 'error', database: 'disconnected' });
+      console.error('Health check database error:', error);
+      throw new ServiceUnavailableException({ status: 'error', database: 'disconnected', details: error.message });
     }
   }
 }
