@@ -8,6 +8,9 @@ import { Request, Response, NextFunction } from 'express';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
 
 async function startApp() {
+  console.log('--- STARTUP CHECK ---');
+  console.log('DATABASE_URL is set:', !!process.env.DATABASE_URL);
+  
   const app = await NestFactory.create(AppModule);
   // Fix for helmet typings in strict NodeNext module resolution
   const helmetMiddleware = (helmet as any).default ? (helmet as any).default() : (helmet as any)();
