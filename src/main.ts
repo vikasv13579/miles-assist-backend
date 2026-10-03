@@ -9,8 +9,9 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter.
 
 async function startApp() {
   const app = await NestFactory.create(AppModule);
-  
-  app.use(helmet());
+  // Fix for helmet typings in strict NodeNext module resolution
+  const helmetMiddleware = (helmet as any).default ? (helmet as any).default() : (helmet as any)();
+  app.use(helmetMiddleware);
 
   // Global HTTP Request Logger
   app.use((req: Request, res: Response, next: NextFunction) => {
