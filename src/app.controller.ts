@@ -21,7 +21,8 @@ export class AppController {
       return { status: 'ok', database: 'connected' };
     } catch (error) {
       console.error('Health check database error:', error);
-      throw new ServiceUnavailableException({ status: 'error', database: 'disconnected', details: error.message });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new ServiceUnavailableException({ status: 'error', database: 'disconnected', details: errorMessage });
     }
   }
 }
