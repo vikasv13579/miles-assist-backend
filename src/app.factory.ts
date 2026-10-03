@@ -14,7 +14,15 @@ export function configureApp(app: INestApplication) {
     next();
   });
 
-  app.enableCors({ origin: process.env.CORS_ORIGIN || '*' });
+  const allowedOrigins = new Set([
+    'http://localhost:3000',
+    'https://miles-assist.vercel.app',
+    ...(process.env.CORS_ORIGIN ?? '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter((origin) => origin && origin !== '*'),
+  ]);
+  app.enableCors({ origin: [...allowedOrigins] });
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
