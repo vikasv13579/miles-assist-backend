@@ -122,3 +122,12 @@ Pass these to \`POST /auth/login\` to retrieve a JWT Bearer token, which is requ
 - The default rate limit is configured to 100 requests per minute globally.
 - CORS is enabled (configurable via \`CORS_ORIGIN\`).
 - Sensitive data, like password hashes, is never returned in API responses. All errors use a standard NestJS exception filter to avoid leaking stack traces.
+
+## Deploying the backend to Vercel
+
+1. Import the repository into Vercel and set **Root Directory** to \`backend\`.
+2. In **Project Settings → Environment Variables**, add \`DATABASE_URL\` with the pooled PostgreSQL connection URL. Add it to each environment you deploy (Production, Preview, and Development as needed).
+3. Add \`JWT_SECRET\` with a long, random secret. Set \`CORS_ORIGIN\` to the deployed frontend's origin (for example, \`https://your-frontend.vercel.app\`).
+4. Redeploy after saving the variables. Vercel does not read your local \`.env\` file.
+
+The Vercel function entry point and rewrite are configured in \`api/index.ts\` and \`vercel.json\`. The root route and API endpoints (including \`/health\` and \`/api/docs\`) are forwarded to the NestJS application.
