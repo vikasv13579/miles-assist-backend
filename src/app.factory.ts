@@ -2,8 +2,10 @@ import { ValidationPipe } from '@nestjs/common';
 import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
-import helmet from 'helmet';
+import { createRequire } from 'node:module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
+
+const helmet: typeof import('helmet').default = createRequire(import.meta.url)('helmet');
 
 export function configureApp(app: INestApplication) {
   app.use(helmet());
