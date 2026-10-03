@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String
+  phone        String?
+  status       UserStatus    @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  transactions Transaction[]
+  bookings     Booking[]
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Transaction {
+  id        String            @id @default(uuid())
+  userId    String
+  user      User              @relation(fields: [userId], references: [id])
+  amount    Decimal           @db.Decimal(10, 2)
+  status    TransactionStatus @default(PENDING)
+  reference String            @unique
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([reference])
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  status      BookingStatus @default(PENDING)
+  bookingDate DateTime
+  reference   String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([bookingDate])
+  @@index([reference])
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  PENDING
+  COMPLETED
+}
