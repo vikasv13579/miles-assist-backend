@@ -2,14 +2,9 @@ import { ValidationPipe } from '@nestjs/common';
 import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
-import * as helmetModule from 'helmet';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
 
-const helmet = helmetModule.default;
-
 export function configureApp(app: INestApplication) {
-  app.use(helmet());
-
   app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
     res.on('finish', () => {
